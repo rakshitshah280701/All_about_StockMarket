@@ -1,6 +1,6 @@
 To run the project on Aws Ec2 Ubuntu instance 
 - create the instance
-- clone this repository using "git clone https://github.com/poojan0099/StockMarket_full_project.git".
+- clone this repository using "git clone https://github.com/rakshitshah280701/All_about_StockMarket.git".
 - change the working directory to the project's directory uing cd command.
 - install pip using "sudo apt install python3-pip".
 - to install all the libraries in the requiremnet.txt file, run "pip3 install -r requirements.txt".
