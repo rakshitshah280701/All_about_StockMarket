@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block bgimg %}
+
+{% for news, link in limited.items() %}
+<div class="row" >
+  <div class="col-md-12 jobs_index_middle_panels">
+    <div class="card ">
+        <div class="card-body" id="myTable">
+          <h5 class="card-title"><a href="{{link}}" target="_blank">{{news}}</a></h5>
+        </div><br>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+{% block block %}{% endblock %}

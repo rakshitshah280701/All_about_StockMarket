@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block bgimg %}
+<div class="form" xmlns="http://www.w3.org/1999/html">
+        <form id="myform" action="/display_candlestick" method="POST">
+            <input type="text" name="query" />
+            <input
+                type="submit"
+                name="submit"
+                class="submit action-button"
+                value="Submit"
+            />
+        </form>
+    </div>
+</br>
+<iframe src="../static/generate_candlestick.html" height="500" width="1200">
+</iframe>
+{% endblock %}
+{% block block %}{% endblock %}
