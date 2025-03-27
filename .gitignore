@@ -1,0 +1,65 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs and temp files
+*.log
+*.out
+*.bak
+*.swp
+*.swo
+*.tmp
+*.DS_Store
+
+# Pytest and test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# VSCode & IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Flask cache and runtime
+instance/
+*.db
+*.sqlite3
+
+# Model files and result outputs (optional)
+storage/exported_model/
+result.json
+
+# nohup output (from runner.sh)
+log.txt
+
+# Heroku
+*.pid
+Procfile
+
+# Backup or legacy scripts
+legacy/
+

@@ -1,8 +1,74 @@
 {% extends 'layout.html' %}
 {% block bgimg %}
 
-<img src="static\assets\images\predict.png">
-<h3>The Probable Closing For next Trading day can be : {{ result }} </h3>
+<div class="text-center my-4">
+    <label for="symbolSelect">Choose Stock Symbol:</label>
+    <select id="symbolSelect">
+        <option value="^NSEI" selected>NSEI (Nifty 50)</option>
+        <option value="TCS.NS">TCS</option>
+        <option value="INFY.NS">Infosys</option>
+        <option value="RELIANCE.NS">Reliance</option>
+    </select>
+</div>
+
+<div id="candlestickChart" style="height: 500px;"></div>
+<div id="predictionValue" class="mt-4 text-lg font-bold text-center"></div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+  function loadChartAndPrediction(symbol) {
+    fetch(`/get_chart_data?symbol=${symbol}`)
+      .then(res => res.json())
+      .then(json => {
+        if (!json.success) throw new Error(json.error);
+        const data = json.data;
+
+        const trace = {
+          x: data.map(d => d.date),
+          open: data.map(d => d.open),
+          high: data.map(d => d.high),
+          low: data.map(d => d.low),
+          close: data.map(d => d.close),
+          type: 'candlestick',
+          xaxis: 'x',
+          yaxis: 'y'
+        };
+
+        const layout = {
+          title: `Last 60 Days ${symbol} Candlestick Chart`,
+          xaxis: { type: 'category' },
+          yaxis: { autorange: true }
+        };
+
+        Plotly.newPlot('candlestickChart', [trace], layout);
+      });
+
+    // Fetch prediction
+fetch(`/api/predict?symbol=${symbol}`)
+  .then(res => res.json())
+  .then(json => {
+    const predictionDiv = document.getElementById("predictionValue");
+    if (json.result === -1) {
+      predictionDiv.innerText = "⚠️ At the Moment our model only predicts for NSEI. Multi-stock support coming soon. Thank you!";
+
+      predictionDiv.style.color = "red";
+    } else {
+      predictionDiv.innerText = `Predicted Price: ₹${json.result}`;
+      predictionDiv.style.color = "black";
+    }
+  });
+
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("symbolSelect");
+    loadChartAndPrediction(select.value);
+
+    select.addEventListener("change", function () {
+      loadChartAndPrediction(this.value);
+    });
+  });
+</script>
 
 {% endblock %}
 {% block block %}{% endblock %}
