@@ -32,9 +32,9 @@ python app.py
 ```
 ## Structure
 
-services/       # Prediction logic (model_predictor.py)
-routes/         # Flask route handlers
-templates/      # HTML templates (predict.html)
-static/         # CSS/JS/Images
-app.py          # App entrypoint
-result.json     # Stores latest prediction
+- services/       # Prediction logic (model_predictor.py)
+- routes/         # Flask route handlers
+- templates/      # HTML templates (predict.html)
+- static/         # CSS/JS/Images
+- app.py          # App entrypoint
+- result.json     # Stores latest prediction
