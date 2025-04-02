@@ -1,7 +1,7 @@
 # routes/chart_routes.py
 
 from flask import Blueprint, request, jsonify
-from services.model_predictor import stockReader
+from services.ml.utils.data_fetcher import fetch_stock_data
 from datetime import date, timedelta
 
 chart_bp = Blueprint("chart", __name__)
@@ -13,7 +13,8 @@ def get_chart_data():
         end_date = date.today()
         start_date = end_date - timedelta(days=90)
 
-        df = stockReader(symbol, start=start_date, end=end_date)
+        # 📈 Use the modern fetcher
+        df = fetch_stock_data(symbol, start=start_date, end=end_date)
         df = df.tail(60)
 
         data = []

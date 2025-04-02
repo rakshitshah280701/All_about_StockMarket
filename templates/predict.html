@@ -1,74 +1,170 @@
-{% extends 'layout.html' %}
-{% block bgimg %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Predictor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
-<div class="text-center my-4">
-    <label for="symbolSelect">Choose Stock Symbol:</label>
-    <select id="symbolSelect">
-        <option value="^NSEI" selected>NSEI (Nifty 50)</option>
-        <option value="TCS.NS">TCS</option>
-        <option value="INFY.NS">Infosys</option>
-        <option value="RELIANCE.NS">Reliance</option>
-    </select>
-</div>
-
-<div id="candlestickChart" style="height: 500px;"></div>
-<div id="predictionValue" class="mt-4 text-lg font-bold text-center"></div>
-
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script>
-  function loadChartAndPrediction(symbol) {
-    fetch(`/get_chart_data?symbol=${symbol}`)
-      .then(res => res.json())
-      .then(json => {
-        if (!json.success) throw new Error(json.error);
-        const data = json.data;
-
-        const trace = {
-          x: data.map(d => d.date),
-          open: data.map(d => d.open),
-          high: data.map(d => d.high),
-          low: data.map(d => d.low),
-          close: data.map(d => d.close),
-          type: 'candlestick',
-          xaxis: 'x',
-          yaxis: 'y'
-        };
-
-        const layout = {
-          title: `Last 60 Days ${symbol} Candlestick Chart`,
-          xaxis: { type: 'category' },
-          yaxis: { autorange: true }
-        };
-
-        Plotly.newPlot('candlestickChart', [trace], layout);
-      });
-
-    // Fetch prediction
-fetch(`/api/predict?symbol=${symbol}`)
-  .then(res => res.json())
-  .then(json => {
-    const predictionDiv = document.getElementById("predictionValue");
-    if (json.result === -1) {
-      predictionDiv.innerText = "⚠️ At the Moment our model only predicts for NSEI. Multi-stock support coming soon. Thank you!";
-
-      predictionDiv.style.color = "red";
-    } else {
-      predictionDiv.innerText = `Predicted Price: ₹${json.result}`;
-      predictionDiv.style.color = "black";
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0e101c;
+      color: #f3f3f3;
+      padding: 2rem;
     }
-  });
 
-  }
+    input, button {
+      padding: 0.5rem 1rem;
+      margin-right: 1rem;
+      font-size: 1rem;
+    }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const select = document.getElementById("symbolSelect");
-    loadChartAndPrediction(select.value);
+    .spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
 
-    select.addEventListener("change", function () {
-      loadChartAndPrediction(this.value);
-    });
-  });
-</script>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-{% endblock %}
-{% block block %}{% endblock %}
+    .card {
+      background-color: #1e2235;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      width: fit-content;
+    }
+
+    #chart-container {
+      margin-top: 2rem;
+      background-color: white;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📈 Stock Price Predictor</h1>
+
+  <input type="text" id="symbol" placeholder="Enter Stock Symbol (e.g., RELIANCE.NS)" />
+  <button onclick="predict()">Predict</button>
+  <div class="spinner" id="loader"></div>
+
+  <div id="result" class="card" style="display:none;">
+    <h3>Predicted Close Price:</h3>
+    <p id="predictedPrice"></p>
+  </div>
+
+  <div id="chart-container" style="display:none;">
+    <canvas id="candlestickChart" width="800" height="400"></canvas>
+  </div>
+
+  <script>
+    async function predict() {
+      const symbol = document.getElementById("symbol").value.trim();
+      if (!symbol) {
+        alert("Please enter a stock symbol.");
+        return;
+      }
+
+      document.getElementById("loader").style.display = "inline-block";
+      document.getElementById("result").style.display = "none";
+      document.getElementById("chart-container").style.display = "none";
+
+      try {
+        const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
+        const predictionData = await predictionRes.json();
+        if (predictionData.error) throw new Error(predictionData.error);
+
+        document.getElementById("predictedPrice").innerText = 
+          `${predictionData.predicted_close.toFixed(2)} INR`;
+        document.getElementById("result").style.display = "block";
+
+        const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
+        const chartDataJson = await chartRes.json();
+        const chartData = chartDataJson.data.map(item => ({
+          x: new Date(item.date),
+          o: item.open,
+          h: item.high,
+          l: item.low,
+          c: item.close
+        }));
+
+        renderChart(chartData);
+
+      } catch (err) {
+        alert("Error: " + err.message);
+        console.error(err);
+      } finally {
+        document.getElementById("loader").style.display = "none";
+      }
+    }
+
+    let chartInstance;
+    function renderChart(data) {
+      const ctx = document.getElementById('candlestickChart').getContext('2d');
+      document.getElementById("chart-container").style.display = "block";
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'candlestick',
+        data: {
+          datasets: [{
+            label: 'Candlestick Chart',
+            data: data,
+            color: {
+              up: '#4caf50',
+              down: '#f44336',
+              unchanged: '#999'
+            },
+            barThickness: 4, // 🎯 FIX: Controls candle width
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'day',
+                tooltipFormat: 'yyyy-MM-dd'
+              },
+              ticks: {
+                autoSkip: true,
+                maxTicksLimit: 20
+              },
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Price (INR)'
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

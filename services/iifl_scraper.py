@@ -5,24 +5,23 @@ from bs4 import BeautifulSoup
 
 def iifl_news():
     url = "https://www.indiainfoline.com/news"
-    reqs = requests.get(url)
-    soup = BeautifulSoup(reqs.text, "html.parser")
-    news_items = soup.find_all('a')
+    try:
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        soup = BeautifulSoup(response.text, "html.parser")
 
-    headings = []
-    links = []
+        articles = soup.select("a.news-title")  # adjust this selector based on inspect
 
-    for item in news_items:
-        try:
-            if "/article/" in item['href']:
-                text = item.text.strip()
-                if text and text not in headings:
-                    headings.append(text)
-                    link = item['href']
-                    if not link.startswith("http"):
-                        link = "https://www.indiainfoline.com" + link
-                    links.append(link)
-        except Exception:
-            pass
+        headlines = []
+        for tag in articles[:10]:
+            title = tag.get_text(strip=True)
+            link = tag.get("href")
+            if link and not link.startswith("http"):
+                link = "https://www.indiainfoline.com" + link
+            headlines.append({"title": title, "link": link})
 
-    return dict(zip(headings[:10], links[:10]))
+        print("✅ IIFL headlines fetched:", len(headlines))
+        return headlines
+
+    except Exception as e:
+        print("❌ IIFL Scraper Error:", e)
+        return []

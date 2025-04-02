@@ -1,0 +1,32 @@
+<h3>Equity Bulls</h3>
+{% if equity and equity|length > 0 %}
+    <ul>
+        {% for title, link in equity.items() %}
+            <li><a href="{{ link }}" target="_blank">{{ title }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No Equity Bulls news available.</p>
+{% endif %}
+
+<h3>IIFL</h3>
+{% if iifl and iifl|length > 0 %}
+    <ul>
+        {% for title, link in iifl.items() %}
+            <li><a href="{{ link }}" target="_blank">{{ title }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No IIFL news available.</p>
+{% endif %}
+
+<h3>Livemint</h3>
+{% if livemint and livemint|length > 0 %}
+    <ul>
+        {% for title, link in livemint.items() %}
+            <li><a href="{{ link }}" target="_blank">{{ title }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No Livemint news available.</p>
+{% endif %}
