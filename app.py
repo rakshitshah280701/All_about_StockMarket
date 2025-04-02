@@ -11,7 +11,7 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    from services.ml.model_predictor import predict_stock
-    prediction = predict_stock("INFY.NS")
-    print("📊 Manual prediction complete:", prediction)
+    # from services.ml.model_predictor import predict_stock
+    # prediction = predict_stock("INFY.NS")
+    # print("📊 Manual prediction complete:", prediction)
     app.run(debug=True)
