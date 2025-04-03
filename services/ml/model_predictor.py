@@ -163,6 +163,14 @@ def prepare_data(df, window_size=30):
     print(f"🧪 After windowing: X={X.shape}, y={y.shape}")
     return df_scaled, X, y, scaler
 
+def get_next_market_day_from_last_data(last_date):
+    next_day = last_date + timedelta(days=1)
+    while next_day.weekday() >= 5:  # 5 = Saturday, 6 = Sunday
+        next_day += timedelta(days=1)
+    return next_day.strftime("%A, %Y-%m-%d")  # e.g., "Monday, 2025-04-07"
+
+
+
 def predict_stock(symbol, window_size=30):
     model_path = get_model_path(symbol)
     scaler_path = get_scaler_path(symbol)
@@ -215,6 +223,9 @@ def predict_stock(symbol, window_size=30):
         save_scaler(scaler, scaler_path)
         print(f"💾 Scaler saved at {scaler_path}")
 
+    last_available_date = df.index[-1]
+    predicted_date = get_next_market_day_from_last_data(last_available_date)
+
     # ✅ Final prediction
     X_pred_window = df_scaled.drop(columns=["Close"]).iloc[-window_size:].values
 
@@ -239,11 +250,13 @@ def predict_stock(symbol, window_size=30):
 
     print(f"📊 Scaled predicted close price for {symbol}: {scaled_prediction:.4f}")
     print(f"📈 Descaled (actual) predicted close price for {symbol}: ₹{descaled_prediction:.2f}")
+    
 
     return {
         "symbol": symbol,
         "scaled_prediction": float(scaled_prediction),
         "predicted_close": float(descaled_prediction),
+        "predicted_for": predicted_date,
         "model_path": model_path,
         "scaler_path": scaler_path
     }

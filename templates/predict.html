@@ -20,6 +20,19 @@
       margin-right: 1rem;
       font-size: 1rem;
     }
+    a button {
+  background-color: #1e2235;
+  color: #f3f3f3;
+  border: 1px solid #f3f3f3;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+a button:hover {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
 
     .spinner {
       display: none;
@@ -53,14 +66,29 @@
   </style>
 </head>
 <body>
-  <h1>📈 Stock Price Predictor</h1>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>📈 Stock Price Predictor</h1>
+    <div>
+      <a href="/" style="text-decoration: none;">
+        <button style="margin-right: 10px;">🏠 Home</button>
+      </a>
+      <a href="/#blog" style="text-decoration: none;">
+        <button>📰 News</button>
+      </a>
+    </div>
+  </div>
 
   <input type="text" id="symbol" placeholder="Enter Stock Symbol (e.g., RELIANCE.NS)" />
   <button onclick="predict()">Predict</button>
   <div class="spinner" id="loader"></div>
 
-  <div id="result" class="card" style="display:none;">
+  <!-- <div id="result" class="card" style="display:none;">
     <h3>Predicted Close Price:</h3>
+    <p id="predictedPrice"></p>
+  </div> -->
+
+  <div id="result" class="card" style="display:none;">
+    <h3>Predicted Close Price for <span id="predictedDate"></span>:</h3>
     <p id="predictedPrice"></p>
   </div>
 
@@ -79,31 +107,58 @@
       document.getElementById("loader").style.display = "inline-block";
       document.getElementById("result").style.display = "none";
       document.getElementById("chart-container").style.display = "none";
+      
 
-      try {
-        const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
-        const predictionData = await predictionRes.json();
-        if (predictionData.error) throw new Error(predictionData.error);
+  //     try {
+  //       const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
+  //       const predictionData = await predictionRes.json();
+  //       if (predictionData.error) throw new Error(predictionData.error);
 
-        document.getElementById("predictedPrice").innerText = 
-          `${predictionData.predicted_close.toFixed(2)} INR`;
-        document.getElementById("result").style.display = "block";
+  //       document.getElementById("predictedPrice").innerText = 
+  // `₹${predictionData.predicted_close.toFixed(2)} (for ${predictionData.predicted_for})`;
 
-        const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
-        const chartDataJson = await chartRes.json();
-        const chartData = chartDataJson.data.map(item => ({
-          x: new Date(item.date),
-          o: item.open,
-          h: item.high,
-          l: item.low,
-          c: item.close
-        }));
+  //       document.getElementById("result").style.display = "block";
 
-        renderChart(chartData);
+  //       const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
+  //       const chartDataJson = await chartRes.json();
+  //       const chartData = chartDataJson.data.map(item => ({
+  //         x: new Date(item.date),
+  //         o: item.open,
+  //         h: item.high,
+  //         l: item.low,
+  //         c: item.close
+  //       }));
 
-      } catch (err) {
-        alert("Error: " + err.message);
-        console.error(err);
+  //       renderChart(chartData);
+
+  //     } catch (err) {
+  //       alert("Error: " + err.message);
+  //       console.error(err);
+  try {
+  const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
+  const predictionData = await predictionRes.json();
+  if (predictionData.error) throw new Error(predictionData.error);
+
+  document.getElementById("predictedDate").innerText = predictionData.predicted_for;
+  document.getElementById("predictedPrice").innerText = `₹${predictionData.predicted_close.toFixed(2)}`;
+  document.getElementById("result").style.display = "block";
+
+  const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
+  const chartDataJson = await chartRes.json();
+  const chartData = chartDataJson.data.map(item => ({
+    x: new Date(item.date),
+    o: item.open,
+    h: item.high,
+    l: item.low,
+    c: item.close
+  }));
+
+  renderChart(chartData);
+
+} catch (err) {
+  alert("Error: " + err.message);
+  console.error(err);
+
       } finally {
         document.getElementById("loader").style.display = "none";
       }
