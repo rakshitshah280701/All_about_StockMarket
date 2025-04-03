@@ -136,6 +136,10 @@ a button:hover {
   //       console.error(err);
   try {
   const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
+  if (!predictionRes.ok) {
+  const errText = await predictionRes.text();
+  throw new Error(errText || "Unknown server error");
+}
   const predictionData = await predictionRes.json();
   if (predictionData.error) throw new Error(predictionData.error);
 

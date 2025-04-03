@@ -25,7 +25,11 @@ def api_predict():
     try:
         logger.info(f"🔍 Predicting for symbol: {symbol}")
         result = predict_stock(symbol)
-        return jsonify(result)
+        return jsonify({
+            "symbol": result["symbol"],
+            "predicted_close": result["predicted_close"],
+            "predicted_for": result["predicted_for"]
+        })
 
     except ValueError as ve:
         logger.error(f"🚨 Data error for {symbol}: {str(ve)}")
