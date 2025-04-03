@@ -15,15 +15,12 @@ def predict():
 
 # 🔹 2. API route — Handles AJAX prediction logic
 @predict_bp.route("/api/predict")
-def api_predict():
-    symbol = request.args.get("symbol")
-
+def predict_api():
+    symbol = request.args.get("symbol", "").strip()
     if not symbol:
-        logger.warning("🚫 Missing 'symbol' in query params.")
-        return jsonify({"error": "Missing required query parameter: 'symbol'"}), 400
+        return jsonify({"error": "No stock symbol provided."}), 400
 
     try:
-        logger.info(f"🔍 Predicting for symbol: {symbol}")
         result = predict_stock(symbol)
         return jsonify({
             "symbol": result["symbol"],
@@ -32,8 +29,9 @@ def api_predict():
         })
 
     except ValueError as ve:
-        logger.error(f"🚨 Data error for {symbol}: {str(ve)}")
         return jsonify({"error": str(ve)}), 400
+    
     except Exception as e:
-        logger.exception(f"💥 Critical error for {symbol}")
-        return jsonify({"error": "Internal server error"}), 500
+        print(f"❌ Unhandled Error: {e}")
+        return jsonify({"error": "Server error while predicting. Try again."}), 500
+

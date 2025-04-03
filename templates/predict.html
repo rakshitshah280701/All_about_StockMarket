@@ -20,19 +20,19 @@
       margin-right: 1rem;
       font-size: 1rem;
     }
+
     a button {
-  background-color: #1e2235;
-  color: #f3f3f3;
-  border: 1px solid #f3f3f3;
-  border-radius: 5px;
-  cursor: pointer;
-}
+      background-color: #1e2235;
+      color: #f3f3f3;
+      border: 1px solid #f3f3f3;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-a button:hover {
-  background-color: #3498db;
-  border-color: #3498db;
-}
-
+    a button:hover {
+      background-color: #3498db;
+      border-color: #3498db;
+    }
 
     .spinner {
       display: none;
@@ -82,11 +82,6 @@ a button:hover {
   <button onclick="predict()">Predict</button>
   <div class="spinner" id="loader"></div>
 
-  <!-- <div id="result" class="card" style="display:none;">
-    <h3>Predicted Close Price:</h3>
-    <p id="predictedPrice"></p>
-  </div> -->
-
   <div id="result" class="card" style="display:none;">
     <h3>Predicted Close Price for <span id="predictedDate"></span>:</h3>
     <p id="predictedPrice"></p>
@@ -98,71 +93,54 @@ a button:hover {
 
   <script>
     async function predict() {
-      const symbol = document.getElementById("symbol").value.trim();
-      if (!symbol) {
-        alert("Please enter a stock symbol.");
+      const symbol = document.getElementById("symbol").value.trim().toUpperCase();
+      if (!symbol || (!symbol.endsWith(".NS") && !symbol.startsWith("^"))) {
+        alert("Please enter a valid NSE symbol (e.g., RELIANCE.NS or ^NSEI).");
         return;
       }
 
       document.getElementById("loader").style.display = "inline-block";
       document.getElementById("result").style.display = "none";
       document.getElementById("chart-container").style.display = "none";
-      
 
-  //     try {
-  //       const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
-  //       const predictionData = await predictionRes.json();
-  //       if (predictionData.error) throw new Error(predictionData.error);
+      try {
+        const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
+        const contentType = predictionRes.headers.get("content-type");
 
-  //       document.getElementById("predictedPrice").innerText = 
-  // `₹${predictionData.predicted_close.toFixed(2)} (for ${predictionData.predicted_for})`;
+        if (!predictionRes.ok) {
+          const errorText = await predictionRes.text();
+          throw new Error(errorText || "Server returned an error.");
+        }
 
-  //       document.getElementById("result").style.display = "block";
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Invalid server response (expected JSON).");
+        }
 
-  //       const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
-  //       const chartDataJson = await chartRes.json();
-  //       const chartData = chartDataJson.data.map(item => ({
-  //         x: new Date(item.date),
-  //         o: item.open,
-  //         h: item.high,
-  //         l: item.low,
-  //         c: item.close
-  //       }));
+        const predictionData = await predictionRes.json();
 
-  //       renderChart(chartData);
+        if (predictionData.error) {
+          throw new Error(predictionData.error);
+        }
 
-  //     } catch (err) {
-  //       alert("Error: " + err.message);
-  //       console.error(err);
-  try {
-  const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
-  if (!predictionRes.ok) {
-  const errText = await predictionRes.text();
-  throw new Error(errText || "Unknown server error");
-}
-  const predictionData = await predictionRes.json();
-  if (predictionData.error) throw new Error(predictionData.error);
+        document.getElementById("predictedDate").innerText = predictionData.predicted_for;
+        document.getElementById("predictedPrice").innerText = `₹${predictionData.predicted_close.toFixed(2)}`;
+        document.getElementById("result").style.display = "block";
 
-  document.getElementById("predictedDate").innerText = predictionData.predicted_for;
-  document.getElementById("predictedPrice").innerText = `₹${predictionData.predicted_close.toFixed(2)}`;
-  document.getElementById("result").style.display = "block";
+        const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
+        const chartDataJson = await chartRes.json();
+        const chartData = chartDataJson.data.map(item => ({
+          x: new Date(item.date),
+          o: item.open,
+          h: item.high,
+          l: item.low,
+          c: item.close
+        }));
 
-  const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
-  const chartDataJson = await chartRes.json();
-  const chartData = chartDataJson.data.map(item => ({
-    x: new Date(item.date),
-    o: item.open,
-    h: item.high,
-    l: item.low,
-    c: item.close
-  }));
+        renderChart(chartData);
 
-  renderChart(chartData);
-
-} catch (err) {
-  alert("Error: " + err.message);
-  console.error(err);
-
+      } catch (err) {
+        alert("Error: " + err.message);
+        console.error("Prediction Error:", err);
       } finally {
         document.getElementById("loader").style.display = "none";
       }
@@ -186,7 +164,7 @@ a button:hover {
               down: '#f44336',
               unchanged: '#999'
             },
-            barThickness: 4, // 🎯 FIX: Controls candle width
+            barThickness: 4,
             borderWidth: 1
           }]
         },

@@ -172,6 +172,10 @@ def get_next_market_day_from_last_data(last_date):
 
 
 def predict_stock(symbol, window_size=30):
+
+    if not symbol.endswith(".NS") and not symbol.startswith("^"):
+        raise ValueError("Invalid symbol format. Must end with .NS or start with ^")
+
     model_path = get_model_path(symbol)
     scaler_path = get_scaler_path(symbol)
     csv_path = get_data_path(symbol)
@@ -180,6 +184,7 @@ def predict_stock(symbol, window_size=30):
     model_exists = os.path.exists(model_path)
     scaler_exists = os.path.exists(scaler_path)
     csv_exists = os.path.exists(csv_path)
+    
 
     print(f"📦 Model: {model_exists}, Scaler: {scaler_exists}, CSV: {csv_exists}")
 
@@ -203,8 +208,8 @@ def predict_stock(symbol, window_size=30):
     else:
         print(f"📈 Training new model for {symbol}")
         df = get_recent_data(symbol)
-        if df.empty:
-            raise ValueError(f"❌ No data for {symbol}.")
+        if df is None or df.empty:
+            raise ValueError(f"No data found for symbol '{symbol}'. Please try another.")
         if len(df) < (window_size * 2):  # Require at least 2x window size
             raise ValueError(f"❌ Insufficient data ({len(df)} rows). Need {window_size * 2}.")
         os.makedirs(RAW_DATA_DIR, exist_ok=True)
