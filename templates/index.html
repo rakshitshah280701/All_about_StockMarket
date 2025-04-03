@@ -1,413 +1,124 @@
-<!doctype html>
-<html class="no-js" lang="en">
+{% extends 'layout.html' %}
+{% block bgimg %}
+<div class="container py-5 text-white">
 
-<head>
-    <meta charset="utf-8">
-    
-    <!--====== Title ======-->
-    <title>Stock Market Prediction</title>
-    
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  
 
-    <!--====== Favicon Icon ======-->
-    <link rel="shortcut icon" href="static/assets/images/favicon.png" type="image/png">
-        
-    <!--====== Slick CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/slick.css">
-        
-    <!--====== Font Awesome CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/font-awesome.min.css">
-        
-    <!--====== Line Icons CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/LineIcons.css">
-        
-    <!--====== Animate CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/animate.css">
-        
-    <!--====== Magnific Popup CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/magnific-popup.css">
-        
-    <!--====== Bootstrap CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/bootstrap.min.css">
-    
-    <!--====== Default CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/default.css">
-    
-    <!--====== Style CSS ======-->
-    <link rel="stylesheet" href="static/assets/css/style.css">
-    
-</head>
+  <!-- Hero -->
+  <div class="text-center mb-4">
+    <h1 class="display-5 fw-bold">📊 Smart Stock Market Assistant</h1>
+    <p class="lead text-light">ML-powered predictions. Real-time insights. Smarter investing made simple.</p>
+    <span class="badge bg-info text-dark" id="marketStatus">Checking market status...</span>
+  </div>
 
-<body>
-    <!--[if IE]>
-    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
-   
-   
-    <!--====== PRELOADER PART START ======-->
+  <!-- Live Ticker -->
+  <div class="bg-secondary p-2 rounded mb-4 text-center ticker-box">
+    <div id="liveTicker" class="ticker-text">Loading indices...</div>
+  </div>
 
-    <div class="preloader">
-        <div class="loader">
-            <div class="ytp-spinner">
-                <div class="ytp-spinner-container">
-                    <div class="ytp-spinner-rotator">
-                        <div class="ytp-spinner-left">
-                            <div class="ytp-spinner-circle"></div>
-                        </div>
-                        <div class="ytp-spinner-right">
-                            <div class="ytp-spinner-circle"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- Gainers & Losers Cards -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card bg-dark text-success mb-4 shadow-lg">
+        <div class="card-header border-success">
+          <h5 class="mb-0">📈 Top Gainers (NSE)</h5>
         </div>
-    </div>
-
-    <!--====== PRELOADER PART ENDS ======-->
-    
-    <!--====== HERO SECTION START ======-->
-<header class="header-area">
-    <div class="navbar-area headroom">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <nav class="navbar navbar-expand-lg">
-                        <a class="navbar-brand" href="/">
-                            <img src="static/assets/images/logo.png" alt="Logo">
-                        </a>
-                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
-                            <span class="toggler-icon"></span>
-                            <span class="toggler-icon"></span>
-                            <span class="toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
-                            <ul id="nav" class="navbar-nav m-auto">
-                                <li class="nav-item"><a href="/">Home</a></li>
-                                <li class="nav-item"><a href="#about">About</a></li>
-                                <li class="nav-item"><a href="/news">News</a></li>
-                                <li class="nav-item"><a href="/predict">Predict</a></li>
-                            </ul>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="header-hero bg_cover d-lg-flex align-items-center" style="background-image: url(static/assets/images/header-hero.jpg)">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
-                    <div class="header-hero-content">
-                        <h1 class="hero-title wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
-                            <b>Smart</b> <span>Stock Insights</span> for Smarter <b>Decisions.</b>
-                        </h1>
-                        <p class="text wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.5s">
-                            Real-time news and predictions to power your investment strategy.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="header-hero-image d-flex align-items-center wow fadeInRightBig" data-wow-duration="1s" data-wow-delay="1.1s">
-            <div class="image">
-                <img src="static/assets/images/img1.png" alt="Hero Image">
-            </div>
-        </div>
-    </div>
-</header>
-<!--====== HERO SECTION ENDS ======-->
-
-
-    <!--====== HEADER PART ENDS ======-->
-
-    <!--====== ABOUT PART START ======-->
-
-   <!--====== ABOUT SECTION START ======-->
-<section id="about" class="about-area pt-115 pb-80">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-9">
-          <div class="about-title text-center wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s">
-            <h6 class="welcome">ABOUT</h6>
-            <h3 class="title">Stay informed. Stay Ahead.</h3>
-          </div>
-        </div>
-      </div>
-      <div class="row justify-content-center pt-4">
-        <div class="col-lg-10">
-          <div class="about-content">
-            <p class="text wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s">
-              The stock market is dynamic and complex. Our platform simplifies it for you by providing up-to-date news, stock predictions powered by machine learning, and historical market insights—all in one place.
-            </p>
-          </div>
-        </div>
+        <ul id="topGainers" class="list-group list-group-flush bg-dark"></ul>
       </div>
     </div>
-  </section>
-  <!--====== ABOUT SECTION ENDS ======-->
-  
-
-    <!--====== ABOUT PART ENDS ======-->
-
-    <!--====== OUR SERVICE PART START ======-->
-
-    <!--====== OUR SERVICES START ======-->
-<section id="services" class="our-services-area pt-115">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-xl-5 col-lg-6 col-md-8 col-sm-9">
-          <div class="section-title text-center wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
-            <h6 class="sub-title">Our Services</h6>
-            <h4 class="title">What We Offer</h4>
-          </div>
+    <div class="col-md-6">
+      <div class="card bg-dark text-danger mb-4 shadow-lg">
+        <div class="card-header border-danger">
+          <h5 class="mb-0">📉 Top Losers (NSE)</h5>
         </div>
-      </div>
-  
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="our-services-tab pt-30">
-            <ul class="nav justify-content-center wow fadeIn" data-wow-duration="1s" data-wow-delay="0.5s" id="myTab" role="tablist">
-              <li class="nav-item">
-                <a class="active" id="news-tab" data-toggle="tab" href="#news" role="tab" aria-controls="news" aria-selected="true">
-                  <i class="lni-briefcase"></i> <span>News</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a id="predict-tab" data-toggle="tab" href="#predict" role="tab" aria-controls="predict" aria-selected="false">
-                  <i class="lni-stats-up"></i> <span>Prediction</span>
-                </a>
-              </li>
-            </ul>
-  
-            <div class="tab-content" id="myTabContent">
-              <!-- News Tab -->
-              <div class="tab-pane fade show active" id="news" role="tabpanel" aria-labelledby="news-tab">
-                <div class="row">
-                  <div class="col-lg-6">
-                    <div class="our-services-image mt-50">
-                      <img src="static/assets/images/img1.png" alt="service">
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="our-services-content mt-45">
-                      <h3 class="services-title">Real-Time Market News</h3>
-                      <p class="text">Access the latest updates from trusted financial sources. Stay informed to make smarter moves in the market.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-  
-              <!-- Prediction Tab -->
-              <div class="tab-pane fade" id="predict" role="tabpanel" aria-labelledby="predict-tab">
-                <div class="row">
-                  <div class="col-lg-6">
-                    <div class="our-services-image mt-50">
-                      <img src="static/assets/images/img1.png" alt="service">
-                    </div>
-                  </div>
-                  <div class="col-lg-6">
-                    <div class="our-services-content mt-45">
-                      <h3 class="services-title">Stock Prediction Models</h3>
-                      <p class="text">Harness the power of machine learning to view tomorrow's market trends today. Our models analyze historical data to predict future price movements.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> <!-- tab-content -->
-          </div> <!-- our-services-tab -->
-        </div>
+        <ul id="topLosers" class="list-group list-group-flush bg-dark"></ul>
       </div>
     </div>
-  </section>
-  <!--====== OUR SERVICES END ======-->
-  
+  </div>
+</div>
 
-    <!--====== OUR SERVICE PART ENDS ======-->
+<!-- Styling -->
+<style>
+  body {
+    background-color: #121212;
+    color: #f1f1f1;
+  }
+  .ticker-box {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker-text {
+    animation: slide 15s linear infinite;
+    display: inline-block;
+    padding-left: 100%;
+    font-weight: 500;
+  }
+  @keyframes slide {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+  .list-group-item {
+    background-color: #1f1f1f;
+    border: none;
+    color: inherit;
+  }
+</style>
 
-    <!--====== SERVICE PART START ======-->
+<!-- Script -->
+<script>
+  async function fetchTicker() {
+    const res = await fetch("/api/ticker");
+    const data = await res.json();
+    document.getElementById("liveTicker").innerHTML = data.map(i =>
+      `${i.name}: ${i.value} <span style="color:${i.trend === 'up' ? 'limegreen' : i.trend === 'down' ? 'red' : 'orange'};">${i.trend === 'flat' ? '•' : i.trend === 'up' ? '↑' : '↓'}</span>`
+    ).join(" | ");
+  }
 
-    <!--====== WHY US SECTION START ======-->
-<section id="service" class="service-area pt-105 pb-80">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-md-8">
-          <div class="section-title wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
-            <h6 class="sub-title">Why Choose Us</h6>
-            <h4 class="title">What Sets Us Apart</h4>
-          </div>
-        </div>
-      </div>
-  
-      <div class="row mt-50 justify-content-center">
-        <div class="col-lg-4 col-md-6">
-          <div class="single-service d-flex">
-            <div class="service-icon">
-              <img src="static/assets/images/service-1.png" alt="Reliable Sources">
-            </div>
-            <div class="service-content media-body">
-              <h4 class="service-title">Reliable Sources</h4>
-              <p class="text">All financial news is sourced from trusted platforms like EquityBulls, IIFL, and Livemint.</p>
-            </div>
-          </div>
-        </div>
-  
-        <div class="col-lg-4 col-md-6">
-          <div class="single-service service-border d-flex">
-            <div class="service-icon">
-              <img src="static/assets/images/service-2.png" alt="Services">
-            </div>
-            <div class="service-content media-body">
-              <h4 class="service-title">Actionable Tools</h4>
-              <p class="text">News aggregation, stock prediction, and market visualization—all under one roof.</p>
-            </div>
-          </div>
-        </div>
-  
-        <div class="col-lg-4 col-md-6">
-          <div class="single-service d-flex">
-            <div class="service-icon">
-              <img src="static/assets/images/service-3.png" alt="Quality">
-            </div>
-            <div class="service-content media-body">
-              <h4 class="service-title">ML-Driven Accuracy</h4>
-              <p class="text">Our backend uses tested machine learning models to provide precise predictions and analytics.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!--====== WHY US SECTION END ======-->
-  
-    <!--====== SERVICE PART ENDS ======-->
+  async function fetchMovers() {
+    try {
+      const res = await fetch("/api/nse-movers");
+      const data = await res.json();
 
-    <!--====== BLOG PART START ======-->
+      const gList = document.getElementById("topGainers");
+      const lList = document.getElementById("topLosers");
 
-    <!--====== BLOG / NEWS SECTION START ======-->
-<section id="blog" class="blog-area pt-115 pb-80">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-6">
-          <div class="section-title text-center pb-20 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s">
-            <h6 class="sub-title">Market News</h6>
-            <h4 class="title">Stay Updated</h4>
-          </div>
-        </div>
-      </div>
-  
-      <div class="row justify-content-center">
-        <div class="col-lg-4 col-md-6 col-sm-8">
-          <div class="single-blog mt-30 wow fadeInUpBig" data-wow-duration="1s" data-wow-delay="0.4s">
-            <div class="blog-image">
-              <a href="/equitybulls"><img src="static/assets/images/eb1.png" alt="EquityBulls"></a>
-            </div>
-            <div class="blog-content">
-              <h4 class="blog-title"><a href="/equitybulls">EquityBulls</a></h4>
-              <p class="text">Daily coverage of stock movements and company earnings.</p>
-            </div>
-          </div>
-        </div>
-  
-        <div class="col-lg-4 col-md-6 col-sm-8">
-          <div class="single-blog mt-30 wow fadeInUpBig" data-wow-duration="1s" data-wow-delay="0.6s">
-            <div class="blog-image">
-              <a href="/iifl"><img src="static/assets/images/iifl1.png" alt="IIFL"></a>
-            </div>
-            <div class="blog-content">
-              <h4 class="blog-title"><a href="/iifl">India Infoline (IIFL)</a></h4>
-              <p class="text">Top financial headlines curated from India’s leading stock site.</p>
-            </div>
-          </div>
-        </div>
-  
-        <div class="col-lg-4 col-md-6 col-sm-8">
-          <div class="single-blog mt-30 wow fadeInUpBig" data-wow-duration="1s" data-wow-delay="0.8s">
-            <div class="blog-image">
-              <a href="/livemint"><img src="static/assets/images/livemint.png" alt="Livemint"></a>
-            </div>
-            <div class="blog-content">
-              <h4 class="blog-title"><a href="/livemint">Livemint</a></h4>
-              <p class="text">Real-time breaking news, market analysis, and economic updates.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!--====== BLOG / NEWS SECTION ENDS ======-->
-  
+      gList.innerHTML = data.gainers.map(s =>
+        `<li class="list-group-item"><strong>${s.symbol}</strong> — ₹${s.price} <span class="text-success">(+${s.change}%)</span></li>`
+      ).join("");
 
-    <!--====== BLOG PART ENDS ======-->
+      lList.innerHTML = data.losers.map(s =>
+        `<li class="list-group-item"><strong>${s.symbol}</strong> — ₹${s.price} <span class="text-danger">(${s.change}%)</span></li>`
+      ).join("");
+    } catch (e) {
+      console.error("Error loading movers:", e);
+    }
+  }
 
-    <!-- ====== CONTACT PART START ======-->
+  function updateMarketStatus() {
+    const now = new Date();
+    const istOffset = 330 * 60 * 1000;
+    const ist = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
 
+    const hours = ist.getHours();
+    const mins = ist.getMinutes();
 
-    <!-- ====== CONTACT PART ENDS ====== -->
+    const marketOpen = (hours > 9 || (hours === 9 && mins >= 15)) && (hours < 15 || (hours === 15 && mins <= 30));
+    const day = ist.getDay();
 
-    <!--====== Predict Part Starts =====-->
+    const statusEl = document.getElementById("marketStatus");
+    if (day >= 1 && day <= 5 && marketOpen) {
+      statusEl.className = "badge bg-success text-dark";
+      statusEl.textContent = "Market is Open";
+    } else {
+      statusEl.className = "badge bg-danger text-light";
+      statusEl.textContent = "Market is Closed";
+    }
+  }
 
-    <!--====== Predict Part Ends =====-->
-
-    <!--====== FOOTER PART START ======-->
-
-    
-
-    <!--====== FOOTER PART ENDS ======-->
-
-    <!--====== BACK TOP TOP PART START ======-->
-
-    <a href="#" class="back-to-top"><i class="lni-chevron-up"></i></a>
-
-    <!--====== BACK TOP TOP PART ENDS ======-->
-
-
-
-
-    <!--====== Jquery js ======-->
-    <script src="static/assets/js/vendor/jquery-1.12.4.min.js"></script>
-    <script src="static/assets/js/vendor/modernizr-3.7.1.min.js"></script>
-
-    <!--====== Bootstrap js ======-->
-    <script src="static/assets/js/popper.min.js"></script>
-    <script src="static/assets/js/bootstrap.min.js"></script>
-
-    <!--====== Slick js ======-->
-    <script src="static/assets/js/slick.min.js"></script>
-
-    <!--====== Isotope js ======-->
-    <script src="static/assets/js/imagesloaded.pkgd.min.js"></script>
-    <script src="static/assets/js/isotope.pkgd.min.js"></script>
-
-    <!--====== Counter Up js ======-->
-    <script src="static/assets/js/waypoints.min.js"></script>
-    <script src="static/assets/js/jquery.counterup.min.js"></script>
-
-    <!--====== Circles js ======-->
-    <script src="static/assets/js/circles.min.js"></script>
-
-    <!--====== Appear js ======-->
-    <script src="static/assets/js/jquery.appear.min.js"></script>
-
-    <!--====== WOW js ======-->
-    <script src="static/assets/js/wow.min.js"></script>
-
-    <!--====== Headroom js ======-->
-    <script src="static/assets/js/headroom.min.js"></script>
-
-    <!--====== Jquery Nav js ======-->
-    <script src="static/assets/js/jquery.nav.js"></script>
-
-    <!--====== Scroll It js ======-->
-    <script src="static/assets/js/scrollIt.min.js"></script>
-
-    <!--====== Magnific Popup js ======-->
-    <script src="static/assets/js/jquery.magnific-popup.min.js"></script>
-
-    <!--====== Main js ======-->
-    <script src="static/assets/js/main.js"></script>
-
-</body>
-
-</html>
+  fetchTicker();
+  fetchMovers();
+  updateMarketStatus();
+  setInterval(fetchTicker, 180000);
+  setInterval(fetchMovers, 180000);
+</script>
+{% endblock %}

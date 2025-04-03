@@ -1,207 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Stock Predictor</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0e101c;
-      color: #f3f3f3;
-      padding: 2rem;
-    }
-
-    input, button {
-      padding: 0.5rem 1rem;
-      margin-right: 1rem;
-      font-size: 1rem;
-    }
-
-    a button {
-      background-color: #1e2235;
-      color: #f3f3f3;
-      border: 1px solid #f3f3f3;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    a button:hover {
-      background-color: #3498db;
-      border-color: #3498db;
-    }
-
-    .spinner {
-      display: none;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .card {
-      background-color: #1e2235;
-      padding: 1rem 2rem;
-      border-radius: 10px;
-      margin-top: 1rem;
-      width: fit-content;
-    }
-
-    #chart-container {
-      margin-top: 2rem;
-      background-color: white;
-      padding: 1rem;
-      border-radius: 8px;
-    }
-  </style>
-</head>
-<body>
-  <div style="display: flex; justify-content: space-between; align-items: center;">
+{% extends 'layout.html' %}
+{% block bgimg %}
+<div class="container py-5 text-white">
+  <div class="text-center mb-4">
     <h1>📈 Stock Price Predictor</h1>
-    <div>
-      <a href="/" style="text-decoration: none;">
-        <button style="margin-right: 10px;">🏠 Home</button>
-      </a>
-      <a href="/#blog" style="text-decoration: none;">
-        <button>📰 News</button>
-      </a>
-    </div>
+    <p>Enter any NSE stock symbol to predict the next closing price</p>
   </div>
 
-  <input type="text" id="symbol" placeholder="Enter Stock Symbol (e.g., RELIANCE.NS)" />
-  <button onclick="predict()">Predict</button>
-  <div class="spinner" id="loader"></div>
+  <div class="text-center mb-4">
+    <input type="text" id="symbol" placeholder="e.g. RELIANCE.NS" class="form-control d-inline w-50" />
+    <button onclick="predict()" class="btn btn-primary" id="predictBtn">Predict</button>
+    <div class="spinner mt-2" id="loader"></div>
+  </div>
 
-  <div id="result" class="card" style="display:none;">
+  <div id="result" class="card text-dark mx-auto p-3" style="display:none; max-width: 500px;">
     <h3>Predicted Close Price for <span id="predictedDate"></span>:</h3>
-    <p id="predictedPrice"></p>
+    <p id="predictedPrice" class="font-weight-bold"></p>
   </div>
 
-  <div id="chart-container" style="display:none;">
-    <canvas id="candlestickChart" width="800" height="400"></canvas>
+  <div id="chart-container" class="mt-5 p-4 rounded" style="display:none;">
+    <div id="candlestickChart" style="height: 500px;"></div>
   </div>
+</div>
 
-  <script>
-    async function predict() {
-      const symbol = document.getElementById("symbol").value.trim().toUpperCase();
-      if (!symbol || (!symbol.endsWith(".NS") && !symbol.startsWith("^"))) {
-        alert("Please enter a valid NSE symbol (e.g., RELIANCE.NS or ^NSEI).");
-        return;
-      }
+<!-- 🌀 Spinner Styles -->
+<style>
+  .spinner {
+    display: none;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+  }
 
-      document.getElementById("loader").style.display = "inline-block";
-      document.getElementById("result").style.display = "none";
-      document.getElementById("chart-container").style.display = "none";
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
 
-      try {
-        const predictionRes = await fetch(`/api/predict?symbol=${symbol}`);
-        const contentType = predictionRes.headers.get("content-type");
+<!-- ✅ Load Plotly -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-        if (!predictionRes.ok) {
-          const errorText = await predictionRes.text();
-          throw new Error(errorText || "Server returned an error.");
-        }
-
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Invalid server response (expected JSON).");
-        }
-
-        const predictionData = await predictionRes.json();
-
-        if (predictionData.error) {
-          throw new Error(predictionData.error);
-        }
-
-        document.getElementById("predictedDate").innerText = predictionData.predicted_for;
-        document.getElementById("predictedPrice").innerText = `₹${predictionData.predicted_close.toFixed(2)}`;
-        document.getElementById("result").style.display = "block";
-
-        const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
-        const chartDataJson = await chartRes.json();
-        const chartData = chartDataJson.data.map(item => ({
-          x: new Date(item.date),
-          o: item.open,
-          h: item.high,
-          l: item.low,
-          c: item.close
-        }));
-
-        renderChart(chartData);
-
-      } catch (err) {
-        alert("Error: " + err.message);
-        console.error("Prediction Error:", err);
-      } finally {
-        document.getElementById("loader").style.display = "none";
-      }
+<script>
+  async function predict() {
+    const symbol = document.getElementById("symbol").value.trim().toUpperCase();
+    if (!symbol || (!symbol.endsWith(".NS") && !symbol.startsWith("^"))) {
+      alert("Please enter a valid NSE symbol (e.g., RELIANCE.NS or ^NSEI).");
+      return;
     }
 
-    let chartInstance;
-    function renderChart(data) {
-      const ctx = document.getElementById('candlestickChart').getContext('2d');
-      document.getElementById("chart-container").style.display = "block";
+    document.getElementById("loader").style.display = "inline-block";
+    document.getElementById("result").style.display = "none";
+    document.getElementById("chart-container").style.display = "none";
 
-      if (chartInstance) chartInstance.destroy();
+    try {
+      // 📊 Fetch prediction
+      const res = await fetch(`/api/predict?symbol=${symbol}`);
+      const prediction = await res.json();
+      if (prediction.error) throw new Error(prediction.error);
 
-      chartInstance = new Chart(ctx, {
-        type: 'candlestick',
-        data: {
-          datasets: [{
-            label: 'Candlestick Chart',
-            data: data,
-            color: {
-              up: '#4caf50',
-              down: '#f44336',
-              unchanged: '#999'
-            },
-            barThickness: 4,
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: { mode: 'index', intersect: false }
-          },
-          scales: {
-            x: {
-              type: 'time',
-              time: {
-                unit: 'day',
-                tooltipFormat: 'yyyy-MM-dd'
-              },
-              ticks: {
-                autoSkip: true,
-                maxTicksLimit: 20
-              },
-              title: {
-                display: true,
-                text: 'Date'
-              }
-            },
-            y: {
-              beginAtZero: false,
-              title: {
-                display: true,
-                text: 'Price (INR)'
-              }
-            }
-          }
-        }
-      });
+      document.getElementById("predictedDate").innerText = prediction.predicted_for;
+      document.getElementById("predictedPrice").innerText = `₹${prediction.predicted_close.toFixed(2)}`;
+      document.getElementById("result").style.display = "block";
+
+      // 🕯️ Fetch chart data
+      const chartRes = await fetch(`/get_chart_data?symbol=${symbol}`);
+      const chartJson = await chartRes.json();
+      const data = chartJson.data;
+
+      renderCandlestickChart(data);
+    } catch (err) {
+      alert("Error: " + err.message);
+      console.error("Prediction Error:", err);
+    } finally {
+      document.getElementById("loader").style.display = "none";
     }
-  </script>
-</body>
-</html>
+  }
+
+  function renderCandlestickChart(data) {
+    document.getElementById("chart-container").style.display = "block";
+
+    const trace = {
+      x: data.map(row => row.date),
+      open: data.map(row => row.open),
+      high: data.map(row => row.high),
+      low: data.map(row => row.low),
+      close: data.map(row => row.close),
+      type: 'candlestick',
+      increasing: { line: { color: 'lime' } },
+      decreasing: { line: { color: 'red' } },
+      name: "Candlestick"
+    };
+
+    const layout = {
+      title: "Last 60 Days Candlestick Chart",
+      xaxis: {
+        title: "Date",
+        type: "category"
+      },
+      yaxis: {
+        title: "Price (₹)"
+      },
+      plot_bgcolor: "#111",
+      paper_bgcolor: "#111",
+      font: { color: "#fff" }
+    };
+
+    Plotly.newPlot('candlestickChart', [trace], layout);
+  }
+</script>
+{% endblock %}

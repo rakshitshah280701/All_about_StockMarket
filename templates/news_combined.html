@@ -1,32 +1,32 @@
-<h3>Equity Bulls</h3>
-{% if equity and equity|length > 0 %}
-    <ul>
-        {% for title, link in equity.items() %}
-            <li><a href="{{ link }}" target="_blank">{{ title }}</a></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No Equity Bulls news available.</p>
-{% endif %}
+{% extends 'layout.html' %}
+{% block bgimg %}
+<div class="container py-5 text-white">
+  <h2 class="text-center mb-4">📰 Latest Market News</h2>
+  <div id="newsCards" class="row g-4"></div>
+</div>
 
-<h3>IIFL</h3>
-{% if iifl and iifl|length > 0 %}
-    <ul>
-        {% for title, link in iifl.items() %}
-            <li><a href="{{ link }}" target="_blank">{{ title }}</a></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No IIFL news available.</p>
-{% endif %}
+<script>
+  async function fetchNews() {
+    const res = await fetch("/api/news");
+    const news = await res.json();
 
-<h3>Livemint</h3>
-{% if livemint and livemint|length > 0 %}
-    <ul>
-        {% for title, link in livemint.items() %}
-            <li><a href="{{ link }}" target="_blank">{{ title }}</a></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No Livemint news available.</p>
-{% endif %}
+    const container = document.getElementById("newsCards");
+    container.innerHTML = "";
+
+    news.forEach(n => {
+      container.innerHTML += `
+        <div class="col-md-6 col-lg-4">
+          <div class="card bg-dark text-light h-100">
+            <div class="card-body">
+              <h5 class="card-title">${n.title}</h5>
+              <p class="card-text"><small>Source: ${n.source}</small></p>
+              <a href="${n.link}" class="btn btn-outline-info" target="_blank">Read More</a>
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+
+  fetchNews();
+</script>
+{% endblock %}
