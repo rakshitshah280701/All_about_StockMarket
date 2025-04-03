@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: all-about-stockmarket
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"  # Replace `app` with your main .py file name (e.g., main:app or run:app)
