@@ -1,6 +1,5 @@
-<p align="center">
-  <img src="assets/images/StockSage.png" alt="StockSage Logo" width="180"/>
-</p>
+![Logo](screenshots/StockSageLogo.png)
+
 
 # 📈 StockSage – Your Smart Stock Market Assistant
 
