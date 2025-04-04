@@ -6,11 +6,13 @@
 
   <!-- Hero -->
   <div class="text-center mb-4">
+    <img src="{{ url_for('static', filename='assets/images/StockSage.png') }}" 
+     alt="StockSage Logo" width="180" class="mb-3">
+
     <h1 class="display-5 fw-bold">📊 Smart Stock Market Assistant</h1>
     <p class="lead text-light">ML-powered predictions. Real-time insights. Smarter investing made simple.</p>
     <span class="badge bg-info text-dark" id="marketStatus">Checking market status...</span>
   </div>
-
   <!-- Live Ticker -->
   <div class="bg-secondary p-2 rounded mb-4 text-center ticker-box">
     <div id="liveTicker" class="ticker-text">Loading indices...</div>

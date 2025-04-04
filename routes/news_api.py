@@ -2,10 +2,12 @@
 from flask import Blueprint, jsonify
 import requests
 import os
+from dotenv import load_dotenv
+
 
 news_api = Blueprint('news_api', __name__)
-
-NEWS_API_KEY = os.getenv("NEWSDATA_API_KEY") or "pub_78056d199f51e959f06a8baa99fef48f26b81"
+load_dotenv()
+NEWS_API_KEY = os.getenv("NEWSDATA_API_KEY") \
 
 @news_api.route("/api/news")
 def get_newsdata():

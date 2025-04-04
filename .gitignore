@@ -31,7 +31,7 @@ eggs/
 .pytest_cache/
 .coverage
 htmlcov/
-
+.env
 # Jupyter Notebook Checkpoints
 .ipynb_checkpoints/
 
