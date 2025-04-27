@@ -169,12 +169,17 @@ def get_next_market_day_from_last_data(last_date):
         next_day += timedelta(days=1)
     return next_day.strftime("%A, %Y-%m-%d")  # e.g., "Monday, 2025-04-07"
 
-
+def get_recent_data_path(symbol):
+    # For getting the most recent date from _NS.csv file
+    base_symbol = symbol.replace('^', '').replace('.', '_')
+    return os.path.join(RAW_DATA_DIR, f"{base_symbol}.csv")
 
 def predict_stock(symbol, window_size=30):
 
     if not symbol.endswith(".NS") and not symbol.startswith("^"):
         raise ValueError("Invalid symbol format. Must end with .NS or start with ^")
+    
+    fetch_stock_data(symbol)
 
     model_path = get_model_path(symbol)
     scaler_path = get_scaler_path(symbol)
@@ -205,6 +210,23 @@ def predict_stock(symbol, window_size=30):
             os.remove(scaler_path)
             return predict_stock(symbol, window_size)
 
+        # Check recent data file for latest date
+        recent_csv_path = get_recent_data_path(symbol)
+        if os.path.exists(recent_csv_path):
+            try:
+                recent_df = pd.read_csv(recent_csv_path, index_col="Date", parse_dates=True)
+                last_available_date = recent_df.index[-1]
+                print(f"📅 Using last date from recent data: {last_available_date.strftime('%Y-%m-%d')}")
+            except Exception as e:
+                last_available_date = df.index[-1]
+        else:
+            last_available_date = df.index[-1]
+
+        predicted_date = get_next_market_day_from_last_data(last_available_date)
+
+        # Final prediction
+        X_pred_window = df_scaled.drop(columns=["Close"]).iloc[-window_size:].values
+
     else:
         print(f"📈 Training new model for {symbol}")
         df = get_recent_data(symbol)
@@ -228,11 +250,22 @@ def predict_stock(symbol, window_size=30):
         save_scaler(scaler, scaler_path)
         print(f"💾 Scaler saved at {scaler_path}")
 
-    last_available_date = df.index[-1]
-    predicted_date = get_next_market_day_from_last_data(last_available_date)
+        # Check recent data file for latest date
+        recent_csv_path = get_recent_data_path(symbol)
+        if os.path.exists(recent_csv_path):
+            try:
+                recent_df = pd.read_csv(recent_csv_path, index_col="Date", parse_dates=True)
+                last_available_date = recent_df.index[-1]
+                print(f"📅 Using last date from recent data: {last_available_date.strftime('%Y-%m-%d')}")
+            except Exception as e:
+                last_available_date = df.index[-1]
+        else:
+            last_available_date = df.index[-1]
 
-    # ✅ Final prediction
-    X_pred_window = df_scaled.drop(columns=["Close"]).iloc[-window_size:].values
+        predicted_date = get_next_market_day_from_last_data(last_available_date)
+
+        # Final prediction
+        X_pred_window = df_scaled.drop(columns=["Close"]).iloc[-window_size:].values
 
     if len(X_pred_window) < window_size:
         raise ValueError("❌ Not enough recent data to make prediction.")

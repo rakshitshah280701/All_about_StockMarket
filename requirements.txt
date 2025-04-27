@@ -19,7 +19,6 @@ idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.6
 joblib==1.4.2
-keras==2.15.0
 libclang==18.1.1
 lxml==5.3.1
 Markdown==3.7
