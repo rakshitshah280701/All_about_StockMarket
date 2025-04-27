@@ -17,13 +17,16 @@
 #     app.run(debug=True)
 
 from flask import Flask, redirect, jsonify, render_template
+from dotenv import load_dotenv
 from routes import register_blueprints
 import yfinance as yf
 import pandas as pd
 import requests
+import json
+import os
 
-
-
+# Load environment variables at startup
+load_dotenv()
 
 def create_app():
     app = Flask(__name__)
@@ -77,22 +80,67 @@ def get_ticker_data():
 
     return jsonify(data)
 
+# @app.route('/api/nse-movers')
+# def get_nse_movers():
+#     try:
+#         # Step 1: List of NIFTY 50 symbols
+#         nifty50_symbols = [
+#             "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS", "SBIN.NS",
+#             "ITC.NS", "LT.NS", "AXISBANK.NS", "KOTAKBANK.NS", "HINDUNILVR.NS", "WIPRO.NS",
+#             "ONGC.NS", "BAJFINANCE.NS", "MARUTI.NS", "NTPC.NS", "ASIANPAINT.NS", "SUNPHARMA.NS",
+#              "POWERGRID.NS", "ULTRACEMCO.NS", "HCLTECH.NS", "TITAN.NS", "TECHM.NS",
+#             "GRASIM.NS", "JSWSTEEL.NS", "BPCL.NS", "CIPLA.NS", "DRREDDY.NS", "HINDALCO.NS"
+#         ]
+
+#         # Step 2: Fetch 1-day historical data for all
+#         data = yf.download(tickers=" ".join(nifty50_symbols), period="1d", interval="1d", group_by='ticker')
+
+#         # Step 3: Build DataFrame of % change
+#         movers = []
+#         for symbol in nifty50_symbols:
+#             try:
+#                 df = data[symbol]
+#                 open_price = df["Open"].values[0]
+#                 close_price = df["Close"].values[0]
+#                 change_pct = ((close_price - open_price) / open_price) * 100
+#                 movers.append({
+#                     "symbol": symbol.replace(".NS", ""),
+#                     "price": f"{close_price:.2f}",
+#                     "change": f"{change_pct:.2f}"
+#                 })
+#             except Exception as e:
+#                 continue  # Skip broken ones
+
+#         # Step 4: Sort and slice top 5
+#         gainers = sorted(movers, key=lambda x: float(x["change"]), reverse=True)[:5]
+#         losers = sorted(movers, key=lambda x: float(x["change"]))[:5]
+
+#         return jsonify({"gainers": gainers, "losers": losers})
+
+#     except Exception as e:
+#         print("yfinance mover error:", e)
+#         return jsonify({"gainers": [], "losers": [], "error": str(e)}), 500
+
+
+# ... existing imports ...
+
 @app.route('/api/nse-movers')
 def get_nse_movers():
     try:
-        # Step 1: List of NIFTY 50 symbols
+        # NIFTY 50 Yahoo symbols
         nifty50_symbols = [
             "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS", "SBIN.NS",
             "ITC.NS", "LT.NS", "AXISBANK.NS", "KOTAKBANK.NS", "HINDUNILVR.NS", "WIPRO.NS",
             "ONGC.NS", "BAJFINANCE.NS", "MARUTI.NS", "NTPC.NS", "ASIANPAINT.NS", "SUNPHARMA.NS",
-             "POWERGRID.NS", "ULTRACEMCO.NS", "HCLTECH.NS", "TITAN.NS", "TECHM.NS",
-            "GRASIM.NS", "JSWSTEEL.NS", "BPCL.NS", "CIPLA.NS", "DRREDDY.NS", "HINDALCO.NS"
+            "POWERGRID.NS", "ULTRACEMCO.NS", "HCLTECH.NS", "TITAN.NS", "TECHM.NS",
+            "GRASIM.NS", "JSWSTEEL.NS", "BPCL.NS", "CIPLA.NS", "DRREDDY.NS", "HINDALCO.NS",
+            "ADANIPORTS.NS", "ADANIENT.NS", "APOLLOHOSP.NS", "BAJAJ-AUTO.NS", "BHARTIARTL.NS",
+            "BRITANNIA.NS", "COALINDIA.NS", "DIVISLAB.NS", "EICHERMOT.NS", "HEROMOTOCO.NS",
+            "INDUSINDBK.NS", "JSWSTEEL.NS", "M&M.NS", "NESTLEIND.NS", "SHREECEM.NS",
+            "TATACONSUM.NS", "TATAMOTORS.NS", "TATASTEEL.NS", "UPL.NS", "BAJAJFINSV.NS"
         ]
 
-        # Step 2: Fetch 1-day historical data for all
         data = yf.download(tickers=" ".join(nifty50_symbols), period="1d", interval="1d", group_by='ticker')
-
-        # Step 3: Build DataFrame of % change
         movers = []
         for symbol in nifty50_symbols:
             try:
@@ -108,9 +156,8 @@ def get_nse_movers():
             except Exception as e:
                 continue  # Skip broken ones
 
-        # Step 4: Sort and slice top 5
-        gainers = sorted(movers, key=lambda x: float(x["change"]), reverse=True)[:5]
-        losers = sorted(movers, key=lambda x: float(x["change"]))[:5]
+        gainers = sorted(movers, key=lambda x: float(x["change"]), reverse=True)[:10]
+        losers = sorted(movers, key=lambda x: float(x["change"]))[:10]
 
         return jsonify({"gainers": gainers, "losers": losers})
 

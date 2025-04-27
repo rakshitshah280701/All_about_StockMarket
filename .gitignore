@@ -11,8 +11,8 @@ env/
 
 # Distribution / packaging
 build/
-develop-eggs/
 dist/
+develop-eggs/
 eggs/
 *.egg-info/
 .installed.cfg
@@ -32,6 +32,7 @@ eggs/
 .coverage
 htmlcov/
 .env
+
 # Jupyter Notebook Checkpoints
 .ipynb_checkpoints/
 
@@ -51,6 +52,10 @@ instance/
 
 # Model files and result outputs (optional)
 storage/exported_model/
+storage/exported_model/variables/
+storage/scalers/
+storage/raw/
+scripts/data/
 result.json
 
 # nohup output (from runner.sh)
@@ -63,3 +68,17 @@ Procfile
 # Backup or legacy scripts
 legacy/
 
+# Sensitive config
+config.json
+
+# PyInstaller spec files
+*.spec
+
+# Screenshots (if not needed in repo)
+screenshots/
+
+# Local Python version file
+.python-version
+
+# Model update logs (if not needed)
+model_updates.log

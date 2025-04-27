@@ -1,0 +1,47 @@
+[build-system]
+requires = ["briefcase"]
+build-backend = "briefcase.bootstrap"
+
+[tool.briefcase]
+project_name = "StockSage"
+bundle = "com.stocksage"
+version = "1.0.0"
+url = "https://github.com/rakshitshah280701/StockSage"
+license = "MIT"
+author = "Rakshit Shah"
+author_email = "rakshitrajeshshah1@gmail.com"
+
+[tool.briefcase.app.stocksage]
+formal_name = "StockSage"
+description = "Stock Market Analysis and Prediction Tool"
+icon = "screenshots/StockSageLogo"
+sources = ["app.py", "routes", "services", "scripts", "templates", "static"]
+requires = [
+    "flask==3.1.0",
+    "yfinance==0.2.55",
+    "pandas==2.2.3",
+    "numpy==1.26.4",
+    "tensorflow==2.15.0",
+    "scikit-learn==1.6.1",
+    "plotly==6.0.1",
+    "beautifulsoup4==4.13.3",
+    "requests==2.32.3",
+    "gunicorn",
+    "python-dotenv"
+]
+
+# Data files that should be included in the app bundle
+resources = [
+    "templates",
+    "static",
+    "scripts/data",
+    "data/raw",
+    "storage"
+]
+
+[tool.briefcase.app.stocksage.macOS]
+requires = []
+universal_build = true
+
+[tool.briefcase.app.stocksage.windows]
+requires = []
